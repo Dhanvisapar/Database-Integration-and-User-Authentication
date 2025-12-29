@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task 6</title>
+</head>
+<body>
+
+<h2>Register</h2>
+<input id="ruser" placeholder="Username">
+<input id="rpass" type="password" placeholder="Password">
+<button onclick="register()">Register</button>
+
+<h2>Login</h2>
+<input id="luser" placeholder="Username">
+<input id="lpass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<h2>Secure Data</h2>
+<input id="data">
+<button onclick="saveData()">Save</button>
+<button onclick="getData()">View</button>
+
+<ul id="list"></ul>
+
+<script>
+let token = "";
+
+function register() {
+  fetch("/register", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: ruser.value,
+      password: rpass.value
+    })
+  });
+}
+
+function login() {
+  fetch("/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: luser.value,
+      password: lpass.value
+    })
+  })
+  .then(res => res.json())
+  .then(data => token = data.token);
+}
+
+function saveData() {
+  fetch("/data", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({ value: data.value })
+  });
+}
+
+function getData() {
+  fetch("/data", {
+    headers: { "Authorization": token }
+  })
+  .then(res => res.json())
+  .then(items => {
+    list.innerHTML = "";
+    items.forEach(i => list.innerHTML += `<li>${i.value}</li>`);
+  });
+}
+</script>
+
+</body>
+</html>
